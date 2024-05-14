@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>S3 File Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f9;
+            color: #333;
+        }
+        header {
+            background: #005792;
+            color: #fff;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        main {
+            padding: 20px;
+            margin-top: 20px;
+        }
+        h1 {
+            color: #fff;
+        }
+        form {
+            margin-top: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 20px;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Upload and Manage Your Files in S3</h1>
+    </header>
+    <main>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" />
+            <button type="submit">Upload</button>
+        </form>
+
+        <h2>Files on S3</h2>
+        <table id="fileList">
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Size (KB)</th>
+                    <th>Last Modified</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Files will be listed here -->
+            </tbody>
+        </table>
+    </main>
+
+    <script>
+        fetch('/files').then(response => response.json()).then(files => {
+            const fileList = document.getElementById('fileList').getElementsByTagName('tbody')[0];
+            files.forEach(file => {
+                const row = fileList.insertRow();
+                const nameCell = row.insertCell();
+                const sizeCell = row.insertCell();
+                const dateCell = row.insertCell();
+
+                const fileSize = (file.size / 1024).toFixed(2); // Size in KB
+                const fileDate = new Date(file.lastModified);
+                const dateString = fileDate.toLocaleDateString() + ' ' + fileDate.toLocaleTimeString();
+
+                nameCell.innerHTML = `<a href="${file.url}" target="_blank">${file.key}</a>`;
+                sizeCell.textContent = fileSize;
+                dateCell.textContent = dateString;
+            });
+        });
+    </script>
+</body>
+</html>
